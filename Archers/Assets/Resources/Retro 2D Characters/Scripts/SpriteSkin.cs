@@ -68,7 +68,9 @@ public class SpriteSkin : MonoBehaviour {
 				frameIndex += 128;
 			}
 			//Finally, set the new sprite to render.
-			spriteRenderer.sprite = newSpritesheet[frameIndex];
+			if (newSpritesheet.Length > frameIndex) {
+				spriteRenderer.sprite = newSpritesheet[frameIndex];
+			}
 		}
 		else if (newSprite == null)
 		{

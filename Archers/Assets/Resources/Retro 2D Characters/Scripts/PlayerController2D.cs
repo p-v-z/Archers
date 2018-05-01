@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class PlayerController2D : MonoBehaviour {
+	public GameObject containerObject;
+	private ArcherScript archer;
+	
 	private bool moveEnabled = true; //Bool used to check if movement is enabled or not. Use ToggleMovement() to set.
 	[Range (0.0f, 10.0f)]
 	[Tooltip("The movement speed of the controller.")]
@@ -18,6 +21,7 @@ public class PlayerController2D : MonoBehaviour {
 	{
 		origSpeed = moveSpeed;
 		anim = transform.GetComponent<Animator>();
+		archer = containerObject.GetComponent<ArcherScript>();
 	}
 
 	/// <summary>
@@ -35,17 +39,18 @@ public class PlayerController2D : MonoBehaviour {
 		{
 			if (moveVector.x > moveSense || moveVector.x < -moveSense || moveVector.y > moveSense || moveVector.y < -moveSense)
 			{
-				transform.Translate(moveVector * (moveSpeed / 100)); //If movement is enabled and any movement above the threshold (sense) is detected, move controller.
+				containerObject.transform.Translate(moveVector * (moveSpeed / 100)); //If movement is enabled and any movement above the threshold (sense) is detected, move controller.
 			}
 		}
 	}
 
 	void Update()
 	{
-		//Only check for movement if the movement bool is set to true.
+		// Only take input from currentPlayer
+		if (GameManager.GM.currentPlayer != archer.owner) return;
+
 		if (moveEnabled == true)
 		{
-			//Set the move vector to horizontal and vertical input axis values.
 			moveVector = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
 
 			//If horizontal or vertical axis is above the threshold value (moveSense), set the move state to Walk.

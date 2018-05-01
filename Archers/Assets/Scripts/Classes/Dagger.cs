@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bow : Item {
-	public string bowType;
-	public float speedModifier;
-	public float rangeModifier;
+public class Dagger : Item {
 
     // Texture
     public Sprite itemSprite;
 	
+	// Use this for initialization
 	void Start () {
-		itemName = "Bow";
+		
 	}
 	
+	// Update is called once per frame
 	void Update () {
 		
 	}
