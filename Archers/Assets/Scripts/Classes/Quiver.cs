@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Quiver : MonoBehaviour {
+public class Quiver : Item {
+	public int extraArrows;
 
 	// Use this for initialization
 	void Start () {
