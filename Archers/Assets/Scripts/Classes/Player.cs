@@ -10,7 +10,7 @@ public class Player {
 
     public Player(string name) {
         this.name = name;
-        this.gold = 0;
+        this.gold = 10;
     }
 
 }

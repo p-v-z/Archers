@@ -20,13 +20,15 @@ public class GameManager : MonoBehaviour {
 
         this.players = new List<Player>();
 
-        //  instantiate players;
-        AddPlayer("stokovitch", new Vector2(3f, 3f));
+        // Instantiate players;
+        AddPlayer("stokovitch", new Vector2(11f, 11f));
         AddPlayer("janaz", new Vector2(6f, 4f));
         AddPlayer("kov gul", new Vector2(8f, 5f));
 
+        // Assign current player
         currentPlayer = players[0];
         cameraScript.followUnit = currentPlayer.archer;
+        UI_Manager.UIM.UpdateArcher(currentPlayer.archer);
         Debug.Log(currentPlayer.name);
     }
 	

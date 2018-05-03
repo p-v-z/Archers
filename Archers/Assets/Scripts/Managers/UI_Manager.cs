@@ -34,6 +34,19 @@ public class UI_Manager : MonoBehaviour {
         }
     }
 
+	public void UpdateArcher(GameObject archer) {
+		ArcherScript archerScript = archer.GetComponent<ArcherScript>();
+		SetText("State", "-");
+		SetText("MoveSpeed", archerScript.moveSpeed.ToString());
+		SetText("Gold", archerScript.owner.gold.ToString());
+		SetText("Arrows", archerScript.arrows.Count.ToString());
+		SetText("Dagger", "-");
+		SetText("Quiver", "-");
+		SetText("Bow", "-");
+		SetText("Boots", "-");
+		SetText("Interact", "(" + archerScript.selectedItems.Count.ToString() + ")");
+	}
+
 	public void SetText(string field, string newText) {
 		switch(field) {
 			case "State":

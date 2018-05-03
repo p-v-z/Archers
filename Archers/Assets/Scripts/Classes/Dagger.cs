@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Dagger : Item {
+	public string daggerType;
 
     // Texture
     public Sprite itemSprite;

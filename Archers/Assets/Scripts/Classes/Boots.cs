@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Boots : Item {
-
+	public string bootsType;
+	
     // Texture
     public Sprite itemSprite;
 	

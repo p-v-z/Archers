@@ -100,6 +100,7 @@ public class ArcherScript : MonoBehaviour {
 					Debug.Log("Pay " + cost);
 					owner.gold -= cost;
 					itemScript.isForSale = false;
+					UI_Manager.UIM.SetText("Gold", GameManager.GM.currentPlayer.gold.ToString());
 
 					AcquireItem(itemObject, itemScript);
 				} else {
@@ -111,21 +112,18 @@ public class ArcherScript : MonoBehaviour {
 				// You can just pick item up
 				AcquireItem(itemObject, itemScript);
 			}
-
 		}
 	}
 
 	public void AcquireItem(GameObject itemObject, Item itemScript) {
-		/* Arrow */
+		/* Arrow (Carry multiple) */
 		Arrow arrow = itemObject.GetComponent<Arrow>();
 		if (itemObject.GetComponent<Arrow>() != null) {
 			if (this.arrows.Count < this.maxArrows) {
 				// Set current arrow to arrow in array
 				this.arrows.Add(arrow);
-
 				// Disable
 				arrow.gameObject.SetActive(false);
-
 				Debug.Log("Arrow Added");
 			} else {
 				Debug.Log("Arrows FULL");
@@ -135,7 +133,7 @@ public class ArcherScript : MonoBehaviour {
 			UI_Manager.UIM.SetText("Arrows", this.arrows.Count.ToString());
 		}
 
-		/* BOW */
+		/* Bow (Single item) */
 		Bow bow = itemObject.GetComponent<Bow>();
 		if (itemObject.GetComponent<Bow>() != null) {
 			// Recreate current bow in world
@@ -155,6 +153,42 @@ public class ArcherScript : MonoBehaviour {
 
 			// Update UI
 			UI_Manager.UIM.SetText("Bow", this.bow.bowType);
+		}
+
+		Boots boots = itemObject.GetComponent<Boots>();
+		if (itemObject.GetComponent<Boots>() != null) {
+			if (this.boots) {
+				this.boots.transform.position = this.transform.position;
+				this.boots.gameObject.SetActive(true);
+				this.boots = null;
+			}
+			this.boots = boots;
+			this.boots.gameObject.SetActive(false);
+			UI_Manager.UIM.SetText("Boots", this.boots.bootsType);
+		}
+
+		Dagger dagger = itemObject.GetComponent<Dagger>();
+		if (itemObject.GetComponent<Dagger>() != null) {
+			if (this.dagger) {
+				this.dagger.transform.position = this.transform.position;
+				this.dagger.gameObject.SetActive(true);
+				this.dagger = null;
+			}
+			this.dagger = dagger;
+			this.dagger.gameObject.SetActive(false);
+			UI_Manager.UIM.SetText("Dagger", this.dagger.daggerType);
+		}
+		
+		Quiver quiver = itemObject.GetComponent<Quiver>();
+		if (itemObject.GetComponent<Quiver>() != null) {
+			if (this.quiver) {
+				this.quiver.transform.position = this.transform.position;
+				this.quiver.gameObject.SetActive(true);
+				this.quiver = null;
+			}
+			this.quiver = quiver;
+			this.quiver.gameObject.SetActive(false);
+			UI_Manager.UIM.SetText("Quiver", "+" + this.quiver.extraArrows.ToString());
 		}
 	}
 
