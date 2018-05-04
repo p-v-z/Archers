@@ -16,7 +16,10 @@ public class ArcherScript : MonoBehaviour {
 	public Dagger dagger{ get; set; }
 
 	public bool isDead;
+	public bool isAiming;
 	public float moveSpeed;
+
+	private Vector2 aimVector;
 
 	void Start () {
 	}
@@ -37,6 +40,9 @@ public class ArcherScript : MonoBehaviour {
 
 		this.isDead = false;
 		this.moveSpeed = 5;		
+
+		this.isAiming = false;
+		this.aimVector = Vector2.zero;
 	}
 
 	void Update () {
@@ -59,11 +65,34 @@ public class ArcherScript : MonoBehaviour {
 					Debug.Log("now bow equipped");
 				}
 			}
+
+			HandleAim();
 		}
 	}
 
-	void release() {
+	/*/////////////////////////////////////////////////////
+							Aim
+	 //////////////////////////////////////////////////////*/
+	void HandleAim() {
+		
+		if (Input.GetButton("aim-trigger")) {
+			aimVector = new Vector2(Input.GetAxisRaw("aim-x"), Input.GetAxisRaw("aim-y"));
+			Debug.Log(aimVector);
 
+			HandleRelease();
+		}
+	}
+
+	/*/////////////////////////////////////////////////////
+							Release
+	 //////////////////////////////////////////////////////*/
+	void HandleRelease() {
+		if (Input.GetButton("release-trigger")) {
+			// check if have arrows
+
+			Debug.Log("Release");
+			// fire arrow
+		}
 	}
 
 	/*/////////////////////////////////////////////////////
@@ -166,7 +195,6 @@ public class ArcherScript : MonoBehaviour {
 			this.boots.gameObject.SetActive(false);
 			UI_Manager.UIM.SetText("Boots", this.boots.bootsType);
 		}
-
 		Dagger dagger = itemObject.GetComponent<Dagger>();
 		if (itemObject.GetComponent<Dagger>() != null) {
 			if (this.dagger) {
@@ -178,7 +206,6 @@ public class ArcherScript : MonoBehaviour {
 			this.dagger.gameObject.SetActive(false);
 			UI_Manager.UIM.SetText("Dagger", this.dagger.daggerType);
 		}
-		
 		Quiver quiver = itemObject.GetComponent<Quiver>();
 		if (itemObject.GetComponent<Quiver>() != null) {
 			if (this.quiver) {

@@ -71,7 +71,7 @@ public class PlayerController2D : MonoBehaviour {
 				anim.SetBool("isMoving", false);
 			}
 
-			if (Input.GetButton("Fire3") && moveState == MoveState.Walk)
+			if (Input.GetButton("moveAbility") && moveState == MoveState.Walk)
 			{
 				//If the controller is moving and we're holding the run button, double the moveSpeed and change to Run state. Also tell animator to display running animation.
 				moveSpeed = origSpeed * 2;
@@ -79,7 +79,7 @@ public class PlayerController2D : MonoBehaviour {
 
 				anim.SetBool("isRunning", true);
 			}
-			else if (Input.GetButtonUp("Fire3") || moveState == MoveState.Stand)
+			else if (Input.GetButtonUp("moveAbility") || moveState == MoveState.Stand)
 			{
 				//Set the speed and Animator running bool back when we're not running.
 				moveSpeed = origSpeed;

@@ -11,32 +11,56 @@ public class Arrow : Item {
 
 	public bool isActive;
 
+	private float distanceTraveled;
+
     // Texture
     public Sprite itemSprite;
 
-	public void Drop() {
+	private void Awake() {
+	}
+
+	private void Start() {
+		Launch("standard", 10f, 5f, true);
 
 	}
 
-	public void Launch(Player owner, string type, float speed, float range, bool isLaunched) {
-		this.launcher = owner;
+	public void Launch(/*Player owner, */string type, float speed, float range, bool isLaunched) {
+		// this.launcher = owner;
 		this.type = type;
 		this.speed = speed;
 		this.range = range;
 
 		this.isActive = isLaunched;
-		if (isActive) { 
-			// Instantiate()
-		} else {
-			// this.gameObject = null;
-		}
+
+
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (isActive) {
-			// Debug.Log(this.transform);
-		} else {
-		}
+
+		Vector2 inputVector = new Vector2(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"));
+
+/*  
+Vector3 vectorToTarget = targetTransform.position - transform.position;
+float angle = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
+Quaternion q = Quaternion.AngleAxis(angle, Vector3.forward);
+transform.rotation = Quaternion.Slerp(transform.rotation, q, Time.deltaTime * speed);
+*/
+
+
+		// if (isActive) {
+		// 	  if (distanceTraveled < range) {
+		// 		Vector2 oldPosition = transform.position;
+		// 		transform.Translate(0,0,1 * Time.deltaTime);
+		// 		distanceTraveled += Vector2.Distance(oldPosition, transform.position);
+		// 	}
+		// } 
+	}
+
+
+
+	public void Drop() {
+
 	}
 }
