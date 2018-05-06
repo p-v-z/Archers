@@ -19,15 +19,14 @@ public class ArcherScript : MonoBehaviour {
 	public bool isAiming;
 	public float moveSpeed;
 
+	public string state;
+
 	private Vector2 aimVector;
 
-	void Start () {
-	}
 	
 	public void init (Player owner) {
 		this.owner = owner;
 
-		Debug.Log(owner.name);
 		// this.archerObject = Instantiate(archerObject);
 		
 		this.maxArrows = 3;
@@ -42,44 +41,71 @@ public class ArcherScript : MonoBehaviour {
 		this.moveSpeed = 5;		
 
 		this.isAiming = false;
-		this.aimVector = Vector2.zero;
+		// this.aimVector = Vector2.zero;
+
+		this.state = "normal";
+	}
+
+	void Start () {
+		SetState("normal");
 	}
 
 	void Update () {
-        if (!isDead) {
-            // Handle player controls
-            if (GameManager.GM.currentPlayer != owner) return;
+		// Handle player controls
+		if (GameManager.GM.currentPlayer != owner) return;
 
-			if (Input.GetKeyDown(KeyCode.P)) {
-				// this.arrows[0] = new Arrow(this.owner,"normal",5,5,false);
-			}
+        if (!isDead) {
+
+			if (this.state == "launching") return;
+
+
 			if (Input.GetKeyDown(KeyCode.L)) {
 				PickupItem();
 			}
-			if (Input.GetKeyDown(KeyCode.M)) {
-				// get bow modifiers
-				if (this.bow != null) {
-					Debug.Log("speedModifier: " + this.bow.speedModifier.ToString());
-					Debug.Log("rangeModifier: " + this.bow.rangeModifier.ToString());
-				} else {
-					Debug.Log("now bow equipped");
-				}
-			}
 
-			HandleAim();
+			// if (Input.GetKeyDown(KeyCode.P)) {
+				// this.arrows[0] = new Arrow(this.owner,"normal",5,5,false);
+			// }
+			// if (Input.GetKeyDown(KeyCode.M)) {
+			// 	// get bow modifiers
+			// 	if (this.bow != null) {
+			// 		Debug.Log("speedModifier: " + this.bow.speedModifier.ToString());
+			// 		Debug.Log("rangeModifier: " + this.bow.rangeModifier.ToString());
+			// 	} else {
+			// 		Debug.Log("now bow equipped");
+			// 	}
+			// }
+
+			
+			if (this.state == "normal" || this.state == "aiming") {
+				HandleAim();
+			}
 		}
 	}
+
+	/*/////////////////////////////////////////////////////
+					State Management
+	 //////////////////////////////////////////////////////*/
+
+	private void SetState(string newState) {
+		if (this.state == newState) return;
+
+		Debug.Log("state change: " + this.state + " => " + newState);
+		this.state = newState;
+		UI_Manager.UIM.SetText("State", newState);
+	}
+
 
 	/*/////////////////////////////////////////////////////
 							Aim
 	 //////////////////////////////////////////////////////*/
 	void HandleAim() {
-		
 		if (Input.GetButton("aim-trigger")) {
-			aimVector = new Vector2(Input.GetAxisRaw("aim-x"), Input.GetAxisRaw("aim-y"));
-			Debug.Log(aimVector);
+			this.SetState("aiming");
 
 			HandleRelease();
+		} else {
+			this.SetState("normal");
 		}
 	}
 
@@ -87,13 +113,47 @@ public class ArcherScript : MonoBehaviour {
 							Release
 	 //////////////////////////////////////////////////////*/
 	void HandleRelease() {
-		if (Input.GetButton("release-trigger")) {
+		if (Input.GetButtonDown("release-trigger")) {
 			// check if have arrows
+			if (arrows.Count > 0) {
+				// aimVector = new Vector2(Input.GetAxisRaw("aim-x"), Input.GetAxisRaw("aim-y"));
 
-			Debug.Log("Release");
-			// fire arrow
+				float rangeModifier = 0f;
+				float speedModifier = 0f;
+				if (this.bow != null) {
+					rangeModifier = this.bow.rangeModifier;
+					speedModifier = this.bow.speedModifier;
+				} 
+				Debug.Log("rangeModifier: " + rangeModifier.ToString());
+				Debug.Log("speedModifier: " + speedModifier.ToString());
+				
+
+				Arrow currentArrow = arrows[0];
+				
+				// Calc input direction
+				float x = Input.GetAxis("aim-x");
+				float y = -Input.GetAxis("aim-y");
+				float angle = Mathf.Atan2(y, x) * Mathf.Rad2Deg + currentArrow.AngleAdjust;
+				Quaternion direction = Quaternion.AngleAxis(angle , Vector3.back);
+
+				// Release arrow
+				arrows[0].Launch(this.owner, this.transform, direction, speedModifier, rangeModifier);
+				arrows.RemoveAt(0);
+				Debug.Log("angle:  " + angle);
+				this.SetState("launching");
+
+				StartCoroutine(ReleaseRoutine());
+			} else {
+				Debug.Log("No arrows");
+			}
+
 		}
 	}
+
+	private IEnumerator ReleaseRoutine() {
+        yield return new WaitForSeconds(1f);
+		SetState("normal");
+    }
 
 	/*/////////////////////////////////////////////////////
 					Select items in world
@@ -217,6 +277,13 @@ public class ArcherScript : MonoBehaviour {
 			this.quiver.gameObject.SetActive(false);
 			UI_Manager.UIM.SetText("Quiver", "+" + this.quiver.extraArrows.ToString());
 		}
+	}
+
+	public void Kill(Player killer) {
+		this.isDead = true;
+		Debug.Log(owner.name + " has been killed");
+		UI_Manager.UIM.UpdateArcher(gameObject);
+		SetState("dead");
 	}
 
 	public void DropItem(GameObject item) {

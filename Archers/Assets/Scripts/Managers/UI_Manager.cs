@@ -34,8 +34,13 @@ public class UI_Manager : MonoBehaviour {
         }
     }
 
-	public void UpdateArcher(GameObject archer) {
+	public void UpdateArcher(GameObject archer) {		
 		ArcherScript archerScript = archer.GetComponent<ArcherScript>();
+		
+		// only update if current player
+		if (archerScript.owner != GameManager.GM.currentPlayer) return;
+
+		// update fields
 		SetText("State", "-");
 		SetText("MoveSpeed", archerScript.moveSpeed.ToString());
 		SetText("Gold", archerScript.owner.gold.ToString());
