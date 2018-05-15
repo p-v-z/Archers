@@ -42,7 +42,7 @@ public class UI_Manager : MonoBehaviour {
 
 		// update fields
 		SetText("State", "-");
-		SetText("MoveSpeed", archerScript.moveSpeed.ToString());
+		SetText("MoveSpeed", archerScript.controller.speedModifier.ToString());
 		SetText("Gold", archerScript.owner.gold.ToString());
 		SetText("Arrows", archerScript.arrows.Count.ToString());
 		SetText("Dagger", "-");

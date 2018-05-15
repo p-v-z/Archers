@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ArcherScript : MonoBehaviour {
-	// public GameObject archerObject;
+	public GameObject archerObject;
 
-	public Player owner; // { get; set; }
 
 	public int maxArrows;
 	public List<Arrow> arrows;
@@ -16,18 +15,22 @@ public class ArcherScript : MonoBehaviour {
 	public Dagger dagger{ get; set; }
 
 	public bool isDead;
-	public bool isAiming;
-	public float moveSpeed;
+	// public bool isAiming;
+	// public float moveSpeed;
 
+	[HideInInspector]
+	public PlayerController2D controller;
+	public Player owner; // { get; set; 
 	public string state;
 
-	private Vector2 aimVector;
+	private bool handleInput;
 
+	// Input actions: "fire", "interact", "useBoots", "useItem"
 	
 	public void init (Player owner) {
 		this.owner = owner;
 
-		// this.archerObject = Instantiate(archerObject);
+		this.controller = archerObject.GetComponent<PlayerController2D>();
 		
 		this.maxArrows = 3;
 		this.arrows = new List<Arrow>();
@@ -38,10 +41,10 @@ public class ArcherScript : MonoBehaviour {
 		this.dagger = null;
 
 		this.isDead = false;
-		this.moveSpeed = 5;		
+		// this.moveSpeed = 0;		
+		// this.isAiming = false;
 
-		this.isAiming = false;
-		// this.aimVector = Vector2.zero;
+		this.handleInput = true;
 
 		this.state = "normal";
 	}
@@ -55,19 +58,16 @@ public class ArcherScript : MonoBehaviour {
 		if (GameManager.GM.currentPlayer != owner) return;
 
         if (!isDead) {
-
 			if (this.state == "launching") return;
 
 
-			if (Input.GetKeyDown(KeyCode.L)) {
+			if (Input.GetButtonDown("interact")) {
+				Debug.Log("Press Interact");
 				PickupItem();
 			}
 
-			// if (Input.GetKeyDown(KeyCode.P)) {
-				// this.arrows[0] = new Arrow(this.owner,"normal",5,5,false);
-			// }
-			// if (Input.GetKeyDown(KeyCode.M)) {
-			// 	// get bow modifiers
+
+			// if (Input.GetKeyDown(KeyCode.M)) { // get bow modifiers
 			// 	if (this.bow != null) {
 			// 		Debug.Log("speedModifier: " + this.bow.speedModifier.ToString());
 			// 		Debug.Log("rangeModifier: " + this.bow.rangeModifier.ToString());
@@ -76,9 +76,16 @@ public class ArcherScript : MonoBehaviour {
 			// 	}
 			// }
 
-			
-			if (this.state == "normal" || this.state == "aiming") {
-				HandleAim();
+			switch (this.state) {
+				case "normal":
+					
+					HandleAim();
+					break;
+				case "aiming":
+					HandleRelease();
+					break;
+				case "launching":
+					break;
 			}
 		}
 	}
@@ -100,58 +107,54 @@ public class ArcherScript : MonoBehaviour {
 							Aim
 	 //////////////////////////////////////////////////////*/
 	void HandleAim() {
-		if (Input.GetButton("aim-trigger")) {
-			this.SetState("aiming");
+		if (Input.GetButtonDown("fire")) {
+			// check if have arrows
+			if (arrows.Count > 0) {
+				this.SetState("aiming");
+			} else {
+				Debug.Log("No arrows");
+			}
+		} 
 
-			HandleRelease();
-		} else {
-			this.SetState("normal");
-		}
 	}
 
 	/*/////////////////////////////////////////////////////
 							Release
 	 //////////////////////////////////////////////////////*/
 	void HandleRelease() {
-		if (Input.GetButtonDown("release-trigger")) {
-			// check if have arrows
-			if (arrows.Count > 0) {
-				// aimVector = new Vector2(Input.GetAxisRaw("aim-x"), Input.GetAxisRaw("aim-y"));
+		if (Input.GetButtonUp("fire")) {
 
-				float rangeModifier = 0f;
-				float speedModifier = 0f;
-				if (this.bow != null) {
-					rangeModifier = this.bow.rangeModifier;
-					speedModifier = this.bow.speedModifier;
-				} 
-				Debug.Log("rangeModifier: " + rangeModifier.ToString());
-				Debug.Log("speedModifier: " + speedModifier.ToString());
-				
+			float rangeModifier = 0f;
+			float speedModifier = 0f;
+			if (this.bow != null) {
+				rangeModifier = this.bow.rangeModifier;
+				speedModifier = this.bow.speedModifier;
+			} 
+			Debug.Log("rangeModifier: " + rangeModifier.ToString());
+			Debug.Log("speedModifier: " + speedModifier.ToString());
+			
 
-				Arrow currentArrow = arrows[0];
-				
-				// Calc input direction
-				float x = Input.GetAxis("aim-x");
-				float y = -Input.GetAxis("aim-y");
-				float angle = Mathf.Atan2(y, x) * Mathf.Rad2Deg + currentArrow.AngleAdjust;
-				Quaternion direction = Quaternion.AngleAxis(angle , Vector3.back);
+			Arrow currentArrow = arrows[0];
+			
+			// Calc input direction
+			float x = Input.GetAxisRaw("Horizontal");
+			float y = -Input.GetAxisRaw("Vertical");
+			float angle = Mathf.Atan2(y, x) * Mathf.Rad2Deg + currentArrow.AngleAdjust;
+			Quaternion direction = Quaternion.AngleAxis(angle , Vector3.back);
 
-				// Release arrow
-				arrows[0].Launch(this.owner, this.transform, direction, speedModifier, rangeModifier);
-				arrows.RemoveAt(0);
-				Debug.Log("angle:  " + angle);
-				this.SetState("launching");
+			// Release arrow
+			arrows[0].Launch(this.owner, this.transform, direction, speedModifier, rangeModifier);
+			arrows.RemoveAt(0);
+			Debug.Log("angle:  " + angle);
+			this.SetState("launching");
+			// controller.PlayAnimation("shoot");
 
-				StartCoroutine(ReleaseRoutine());
-			} else {
-				Debug.Log("No arrows");
-			}
-
+			StartCoroutine(ReleaseRoutine());
 		}
 	}
 
 	private IEnumerator ReleaseRoutine() {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(1000f);
 		SetState("normal");
     }
 

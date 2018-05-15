@@ -17,17 +17,10 @@ public class Arrow : Item {
     // Texture
     public Sprite itemSprite;
 
-	// private Quaternion m_desiredDirection;
-
 	private void Awake() {
 	}
 
 	private void Start() {
-
-		// Launch("standard", 10f, 5f, direction);
-
-
-
 	}
 
 	public void Launch(Player owner, Transform source, Quaternion direction, float speed, float range) {
@@ -41,20 +34,16 @@ public class Arrow : Item {
 		this.distanceTraveled = 0;
 	}
 	
-	
-	
 	void Update () {
 		if (isActive) {
 			if (distanceTraveled < this.range) {
 				// Move forward
 				transform.Translate(Vector3.up * Time.deltaTime * this.speed);
 				distanceTraveled += Time.deltaTime * this.speed;
-				Debug.Log(distanceTraveled);
 			} else {
 				Disable();
 			}
 		}
-
 	}
 
 	void Disable() {
